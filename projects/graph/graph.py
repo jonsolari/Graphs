@@ -116,13 +116,11 @@ class Graph:
                 self.dft_recursive(neighbor, visited)
         
 
- 
-
     def bfs(self, starting_vertex, destination_vertex):
         """
         Return a list containing the shortest path from
         starting_vertex to destination_vertex in
-        breath-first order.
+        breadth-first order.
         """
         # create an empty queue
         # add A PATH TO the starting vertex_id to the queue
@@ -137,7 +135,23 @@ class Graph:
                 # mark it as visited
                 # add A PATH TO all neighbors to the back of queue
                     # make a copy of the path before adding
-        pass  # TODO
+        
+        queue = Queue()
+        queue.enqueue([starting_vertex])
+        visited = set()
+    
+        while queue.size() > 0:
+            v = queue.dequeue()
+            if v[-1] == destination_vertex:
+                return v
+            if v[-1] not in visited:
+                visited.add(v[-1])
+                path = []
+                for item in v:
+                    path.append(item)
+                for neighbor in self.get_neighbors(v[-1]):
+                    queue.enqueue(path + [neighbor])
+
 
     def dfs(self, starting_vertex, destination_vertex):
         """
@@ -145,7 +159,21 @@ class Graph:
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
+        stack = Stack()
+        stack.push([starting_vertex])
+        visited = set()
+    
+        while stack.size() > 0:
+            v = stack.pop()
+            if v[-1] == destination_vertex:
+                return v
+            if v[-1] not in visited:
+                visited.add(v[-1])
+                path = []
+                for item in v:
+                    path.append(item)
+                for neighbor in self.get_neighbors(v[-1]):
+                    stack.push(path + [neighbor])
 
     def dfs_recursive(self, starting_vertex, destination_vertex):
         """
