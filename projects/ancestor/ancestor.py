@@ -1,16 +1,15 @@
 from util import Stack, Queue  
 
-def earliest_ancestor(ancestors, starting_node, visited=None):
+def earliest_ancestor(ancestors, starting_node):
 
-    if visited is None:
-        visited = []
+    counter = 0
     
     for i in ancestors:
         if i[1] == starting_node:
-            visited.append(i[0])
-            earliest_ancestor(ancestors, i[0], visited)
+            counter += 1
+            earliest_ancestor(ancestors, i[0])
             
-    print(visited)
+    print(counter)
 
 
             
