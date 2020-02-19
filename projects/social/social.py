@@ -90,9 +90,9 @@ class SocialGraph:
                 visited[vertex] = pathway
 
                 for i in self.friendships[vertex]:
-                    copy = pathway.copy()
-                    copy.append(i)
-                    queue.enqueue(copy)
+                    copied = pathway.copy()
+                    copied.append(i)
+                    queue.enqueue(copied)
             
         return visited
 
