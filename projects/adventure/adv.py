@@ -2,6 +2,8 @@ from room import Room
 from player import Player
 from world import World
 
+from util import Stack, Queue
+
 import random
 from ast import literal_eval
 
@@ -13,8 +15,8 @@ world = World()
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
-# map_file = "maps/test_loop_fork.txt"
-map_file = "maps/main_maze.txt"
+map_file = "maps/test_loop_fork.txt"
+# map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -29,7 +31,38 @@ player = Player(world.starting_room)
 # traversal_path = ['n', 'n']
 traversal_path = []
 
+traversal_graph = {}
 
+queue = Queue()
+queue.enqueue([world.starting_room])
+
+while queue.size() > 0:
+    v = queue.dequeue()
+    curr_room = v[-1]
+    
+    if curr_room.id not in traversal_graph.keys():
+        traversal_graph[curr_room.id] = {}
+        path = []
+        for item in v:
+            path.append(item)
+
+        if 'n' in curr_room.get_exits():
+            traversal_graph[curr_room.id]['n']= '?'
+            queue.enqueue(path + [curr_room.n_to])
+        if 's' in curr_room.get_exits():
+            traversal_graph[curr_room.id]['s']= '?'
+            queue.enqueue(path + [curr_room.s_to])
+        if 'w' in curr_room.get_exits():
+            traversal_graph[curr_room.id]['w']= '?'
+            queue.enqueue(path + [curr_room.w_to])
+        if 'e' in curr_room.get_exits():
+            traversal_graph[curr_room.id]['e']= '?'
+            queue.enqueue(path + [curr_room.e_to])
+    
+print(traversal_graph)
+            
+# print("HEY NOW", traversal_graph)
+# print("PATH", path)
 
 # TRAVERSAL TEST
 visited_rooms = set()
