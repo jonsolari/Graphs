@@ -196,15 +196,15 @@ def bread(room):
                         reversal_path.pop(0)
                         final.append('e')
 
-                if thisroom is not None:
+                if thisroom is not None and '?' in traversal_graph[thisroom.id].values():
                     for i in thisroom.get_exits():
                         if i is 'n' and traversal_graph[thisroom.id]['n'] is '?':
                             queue.enqueue(path + [thisroom.n_to])
-                        elif i is 's' and traversal_graph[thisroom.id]['s'] is '?':
+                        if i is 's' and traversal_graph[thisroom.id]['s'] is '?':
                             queue.enqueue(path + [thisroom.s_to])
-                        elif i is 'w' and traversal_graph[thisroom.id]['w'] is '?':
+                        if i is 'w' and traversal_graph[thisroom.id]['w'] is '?':
                             queue.enqueue(path + [thisroom.w_to])
-                        elif i is 'e' and traversal_graph[thisroom.id]['e'] is '?':
+                        if i is 'e' and traversal_graph[thisroom.id]['e'] is '?':
                             queue.enqueue(path + [thisroom.e_to])
         else:
             
@@ -239,6 +239,7 @@ def bread(room):
 
 res2 = bread(new_room)
 res3 = bread(res2)
+# res4 = bread(res3)
 
 
 
