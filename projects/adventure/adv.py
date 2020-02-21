@@ -70,6 +70,121 @@ while graphq.size() > 0:
 
 
 
+
+# INITIAL TRAVERSAL, WORKS
+#  VVVVVVVVVVVVVVVVVVVVVV
+
+def initial(start):
+    queue = Queue()
+    queue.enqueue([start])
+    visited = set()
+
+    while queue.size() > 0:
+        v = queue.dequeue()
+        roomba = v[-1]
+        if roomba not in visited:
+            visited.add(roomba)
+            path = []
+            for item in v:
+                path.append(item)
+            for i in roomba.get_exits():
+                if i is 'n':
+                    queue.enqueue(path + [roomba.n_to])
+                if i is 's':
+                    queue.enqueue(path + [roomba.s_to])
+                if i is 'w':
+                    queue.enqueue(path + [roomba.w_to])
+                if i is 'e':
+                    queue.enqueue(path + [roomba.e_to])
+        else:
+            final = []
+            roomz = []
+            room_idz = []
+            for i in path:
+                room_idz.append(i.id)
+                roomz.append(i)
+            for i in range(0, len(path)):
+                j = i - 1
+                if path[j].n_to == path[i]:
+                    final.append('n')
+                    traversal_graph[path[j].id]['n'] = path[i].id
+                    traversal_graph[path[i].id]['s'] = path[j].id
+                elif path[j].s_to == path[i]:
+                    final.append('s')
+                    traversal_graph[path[j].id]['s'] = path[i].id
+                    traversal_graph[path[i].id]['n'] = path[j].id
+                elif path[j].w_to == path[i]:
+                    final.append('w')
+                    traversal_graph[path[j].id]['w'] = path[i].id
+                    traversal_graph[path[i].id]['e'] = path[j].id
+                elif path[j].e_to == path[i]:
+                    final.append('e')
+                    traversal_graph[path[j].id]['e'] = path[i].id
+                    traversal_graph[path[i].id]['w'] = path[j].id
+    return [final, roomz[-1]]
+
+result = initial(world.starting_room)
+traversal_path = traversal_path + result[0]
+
+new_room = result[1]
+
+#  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# THIS BIT HERE WORKS (25 rooms down)
+
+
+
+
+# V   REVERSAL WORKS   V
+
+def reverse(dir):
+    if dir == 'n':
+        return 's'
+    elif dir == 's':
+        return 'n'
+    elif dir == 'w':
+        return 'e'
+    elif dir == 'e':
+        return 'w'
+    else:
+        return
+
+# ^   REVERSAL WORKS  ^
+
+print(traversal_graph[new_room.id])
+
+
+
+def bread(room):
+    queue = Queue()
+    queue.enqueue([room])
+    visited = set()
+
+    while queue.size() > 0:
+        v = queue.dequeue()
+        thisroom = v[-1]
+        if thisroom == thisroom:
+            return v
+        if thisroom not in visited:
+            visited.add(thisroom)
+            path = []
+            for item in v:
+                path.append(item)
+            for i in thisroom.get_exits():
+                if i is 'n':
+                    queue.enqueue(path + [thisroom.n_to])
+                if i is 's':
+                    queue.enqueue(path + [thisroom.s_to])
+                if i is 'w':
+                    queue.enqueue(path + [thisroom.w_to])
+                if i is 'e':
+                    queue.enqueue(path + [thisroom.e_to])
+
+
+
+
+
+
+
 # def initial(start):
 #     stack = Stack()
 #     stack.push([start])
@@ -121,67 +236,12 @@ while graphq.size() > 0:
 # print("LIST2",list2)
 
 
-# INITIAL DEPTH FIRST TRAVERSAL, WORKS
-#  VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-
-def initial(start):
-    queue = Queue()
-    queue.enqueue([start])
-    visited = set()
-
-    while queue.size() > 0:
-        v = queue.dequeue()
-        roomba = v[-1]
-        if roomba not in visited:
-            visited.add(roomba)
-            path = []
-            for item in v:
-                path.append(item)
-            for i in roomba.get_exits():
-                if i is 'n':
-                    queue.enqueue(path + [roomba.n_to])
-                if i is 's':
-                    queue.enqueue(path + [roomba.s_to])
-                if i is 'w':
-                    queue.enqueue(path + [roomba.w_to])
-                if i is 'e':
-                    queue.enqueue(path + [roomba.e_to])
-        else:
-            final = []
-            room_idz = []
-            for i in path:
-                room_idz.append(i.id)
-            for i in range(0, len(path)):
-                j = i - 1
-                if path[j].n_to == path[i]:
-                    final.append('n')
-                    traversal_graph[path[i].id]['n'] = path[j].id
-                    traversal_graph[path[j].id]['s'] = path[i].id
-                elif path[j].s_to == path[i]:
-                    final.append('s')
-                    traversal_graph[path[i].id]['s'] = path[j].id
-                    traversal_graph[path[j].id]['n'] = path[i].id
-                elif path[j].w_to == path[i]:
-                    final.append('w')
-                    traversal_graph[path[i].id]['w'] = path[j].id
-                    traversal_graph[path[j].id]['e'] = path[i].id
-                elif path[j].e_to == path[i]:
-                    final.append('e')
-                    traversal_graph[path[i].id]['e'] = path[j].id
-                    traversal_graph[path[j].id]['w'] = path[i].id
-    return [final, roomba]
-
-result = initial(world.starting_room)
-traversal_path = traversal_path + result[0]
-
-#  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# THIS BIT HERE WORKS (25 rooms down)
 
 
 
 
 
-print("GRAPH", traversal_graph)
+# print("GRAPH", traversal_graph)
 # print("PATH", traversal_path)
 
 
