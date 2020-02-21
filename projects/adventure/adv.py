@@ -151,10 +151,7 @@ def reverse(dir):
 # ^   REVERSAL WORKS  ^
 
 
-reversal_path = []
 
-for i in reversed(traversal_path):
-    reversal_path.append(reverse(i))
 
 # print(traversal_path)
 # print(reversal_path)
@@ -164,6 +161,9 @@ def bread(room):
     queue = Queue()
     queue.enqueue([room])
     visited = set()
+    reversal_path = []
+    for i in reversed(traversal_path):
+        reversal_path.append(reverse(i))
 
     while queue.size() > 0:
         v = queue.dequeue()
@@ -225,18 +225,19 @@ def bread(room):
             idid = []
             for i in v:
                 idid.append(i.id)
-    return final
 
-# why does this NOT throw an error...
-print("New path: ", bread(new_room))
-result2 = []
-for i in bread(new_room):
-    result2.append(i)
+    return path[-1]
 
-# ...when this DOES throw an error?
-traversal_path = traversal_path + result2
+bread(new_room)
+res2 = bread(new_room)
 
-print(traversal_path)
+
+
+
+
+
+
+
 
 
 
