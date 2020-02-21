@@ -168,24 +168,30 @@ def bread(room):
     while queue.size() > 0:
         v = queue.dequeue()
         thisroom = v[-1]
+        final = []
         if thisroom not in visited:
             visited.add(thisroom)
             path = []
             for item in v:
                 path.append(item)
-            if traversal_graph[thisroom.id]['n'] is not '?' and traversal_graph[thisroom.id]['s'] is not '?' and traversal_graph[thisroom.id]['w'] is not '?' and traversal_graph[thisroom.id]['e'] is not '?':
+            
+            if '?' not in traversal_graph[thisroom.id]:
                 if reversal_path[0] == 'n':
                     queue.enqueue(path + [thisroom.n_to])
                     reversal_path.pop(0)
-                if reversal_path[0] == 's':
+                    final.append('n')
+                elif reversal_path[0] == 's':
                     queue.enqueue(path + [thisroom.s_to])
                     reversal_path.pop(0)
-                if reversal_path[0] == 'w':
+                    final.append('s')
+                elif reversal_path[0] == 'w':
                     queue.enqueue(path + [thisroom.w_to])
                     reversal_path.pop(0)
-                if reversal_path[0] == 'e':
+                    final.append('w')
+                elif reversal_path[0] == 'e':
                     queue.enqueue(path + [thisroom.e_to])
                     reversal_path.pop(0)
+                    final.append('e')
 
             for i in thisroom.get_exits():
                 if i is 'n' and traversal_graph[thisroom.id]['n'] is '?':
@@ -197,12 +203,40 @@ def bread(room):
                 if i is 'e' and traversal_graph[thisroom.id]['e'] is '?':
                     queue.enqueue(path + [thisroom.e_to])
         else:
+            
+            for i in range(0, len(v)):
+                j = i - 1
+                if path[j].n_to == path[i]:
+                    final.append('n')
+                    traversal_graph[path[j].id]['n'] = path[i].id
+                    traversal_graph[path[i].id]['s'] = path[j].id
+                elif path[j].s_to == path[i]:
+                    final.append('s')
+                    traversal_graph[path[j].id]['s'] = path[i].id
+                    traversal_graph[path[i].id]['n'] = path[j].id
+                elif path[j].w_to == path[i]:
+                    final.append('w')
+                    traversal_graph[path[j].id]['w'] = path[i].id
+                    traversal_graph[path[i].id]['e'] = path[j].id
+                elif path[j].e_to == path[i]:
+                    final.append('e')
+                    traversal_graph[path[j].id]['e'] = path[i].id
+                    traversal_graph[path[i].id]['w'] = path[j].id
             idid = []
             for i in v:
                 idid.append(i.id)
-            return idid
+            return final
 
-print(bread(new_room))
+# why does this NOT throw an error...
+print("New path: ", bread(new_room))
+
+# ...when this DOES throw an error?
+# traversal_path = traversal_path + bread(new_room)
+
+
+
+
+
 
 
 
