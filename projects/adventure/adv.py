@@ -179,22 +179,22 @@ def bread(room):
                     if reversal_path[0] == 'n':
                         queue.enqueue(path + [thisroom.n_to])
                         reversal_path.pop(0)
-                        final.append('n')
+                        traversal_path.append('n')
 
                     elif reversal_path[0] == 's':
                         queue.enqueue(path + [thisroom.s_to])
                         reversal_path.pop(0)
-                        final.append('s')
+                        traversal_path.append('s')
 
                     elif reversal_path[0] == 'w':
                         queue.enqueue(path + [thisroom.w_to])
                         reversal_path.pop(0)
-                        final.append('w')
+                        traversal_path.append('w')
 
                     elif reversal_path[0] == 'e':
                         queue.enqueue(path + [thisroom.e_to])
                         reversal_path.pop(0)
-                        final.append('e')
+                        traversal_path.append('e')
 
                 if thisroom is not None and '?' in traversal_graph[thisroom.id].values():
                     for i in thisroom.get_exits():
@@ -230,7 +230,7 @@ def bread(room):
             for i in v:
                 if i is not None:
                     idid.append(i.id)
-
+    print(idid)
     return path[-1]
 
 # ^^^^^  THIS WORKS, BACKTRACKS TO A NEARBY ROOM WITH NO '?'s   ^^^^^
@@ -239,7 +239,9 @@ def bread(room):
 
 res2 = bread(new_room)
 res3 = bread(res2)
-# res4 = bread(res3)
+res4 = bread(res3)
+
+
 
 
 
