@@ -150,8 +150,14 @@ def reverse(dir):
 
 # ^   REVERSAL WORKS  ^
 
-print(traversal_graph[new_room.id])
 
+reversal_path = []
+
+for i in reversed(traversal_path):
+    reversal_path.append(reverse(i))
+
+# print(traversal_path)
+# print(reversal_path)
 
 
 def bread(room):
@@ -162,25 +168,41 @@ def bread(room):
     while queue.size() > 0:
         v = queue.dequeue()
         thisroom = v[-1]
-        if thisroom == thisroom:
-            return v
         if thisroom not in visited:
             visited.add(thisroom)
             path = []
             for item in v:
                 path.append(item)
-            for i in thisroom.get_exits():
-                if i is 'n':
+            if traversal_graph[thisroom.id]['n'] is not '?' and traversal_graph[thisroom.id]['s'] is not '?' and traversal_graph[thisroom.id]['w'] is not '?' and traversal_graph[thisroom.id]['e'] is not '?':
+                if reversal_path[0] == 'n':
                     queue.enqueue(path + [thisroom.n_to])
-                if i is 's':
+                    reversal_path.pop(0)
+                if reversal_path[0] == 's':
                     queue.enqueue(path + [thisroom.s_to])
-                if i is 'w':
+                    reversal_path.pop(0)
+                if reversal_path[0] == 'w':
                     queue.enqueue(path + [thisroom.w_to])
-                if i is 'e':
+                    reversal_path.pop(0)
+                if reversal_path[0] == 'e':
                     queue.enqueue(path + [thisroom.e_to])
+                    reversal_path.pop(0)
 
+            for i in thisroom.get_exits():
+                if i is 'n' and traversal_graph[thisroom.id]['n'] is '?':
+                    queue.enqueue(path + [thisroom.n_to])
+                if i is 's' and traversal_graph[thisroom.id]['s'] is '?':
+                    queue.enqueue(path + [thisroom.s_to])
+                if i is 'w' and traversal_graph[thisroom.id]['w'] is '?':
+                    queue.enqueue(path + [thisroom.w_to])
+                if i is 'e' and traversal_graph[thisroom.id]['e'] is '?':
+                    queue.enqueue(path + [thisroom.e_to])
+        else:
+            idid = []
+            for i in v:
+                idid.append(i.id)
+            return idid
 
-
+print(bread(new_room))
 
 
 
