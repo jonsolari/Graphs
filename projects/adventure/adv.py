@@ -169,39 +169,43 @@ def bread(room):
         v = queue.dequeue()
         thisroom = v[-1]
         final = []
-        if thisroom not in visited:
+        if thisroom is not None and thisroom not in visited:
             visited.add(thisroom)
             path = []
             for item in v:
                 path.append(item)
-            if thisroom is not None:
+        
                 if '?' not in traversal_graph[thisroom.id].values():
                     if reversal_path[0] == 'n':
                         queue.enqueue(path + [thisroom.n_to])
                         reversal_path.pop(0)
                         final.append('n')
+
                     elif reversal_path[0] == 's':
                         queue.enqueue(path + [thisroom.s_to])
                         reversal_path.pop(0)
                         final.append('s')
+
                     elif reversal_path[0] == 'w':
                         queue.enqueue(path + [thisroom.w_to])
                         reversal_path.pop(0)
                         final.append('w')
+
                     elif reversal_path[0] == 'e':
                         queue.enqueue(path + [thisroom.e_to])
                         reversal_path.pop(0)
                         final.append('e')
 
-                for i in thisroom.get_exits():
-                    if i is 'n' and traversal_graph[thisroom.id]['n'] is '?':
-                        queue.enqueue(path + [thisroom.n_to])
-                    if i is 's' and traversal_graph[thisroom.id]['s'] is '?':
-                        queue.enqueue(path + [thisroom.s_to])
-                    if i is 'w' and traversal_graph[thisroom.id]['w'] is '?':
-                        queue.enqueue(path + [thisroom.w_to])
-                    if i is 'e' and traversal_graph[thisroom.id]['e'] is '?':
-                        queue.enqueue(path + [thisroom.e_to])
+                if thisroom is not None:
+                    for i in thisroom.get_exits():
+                        if i is 'n' and traversal_graph[thisroom.id]['n'] is '?':
+                            queue.enqueue(path + [thisroom.n_to])
+                        elif i is 's' and traversal_graph[thisroom.id]['s'] is '?':
+                            queue.enqueue(path + [thisroom.s_to])
+                        elif i is 'w' and traversal_graph[thisroom.id]['w'] is '?':
+                            queue.enqueue(path + [thisroom.w_to])
+                        elif i is 'e' and traversal_graph[thisroom.id]['e'] is '?':
+                            queue.enqueue(path + [thisroom.e_to])
         else:
             
             for i in range(0, len(v)-1):
@@ -224,12 +228,23 @@ def bread(room):
                     traversal_graph[path[i].id]['w'] = path[j].id
             idid = []
             for i in v:
-                idid.append(i.id)
+                if i is not None:
+                    idid.append(i.id)
 
     return path[-1]
 
-bread(new_room)
+# ^^^^^  THIS WORKS, BACKTRACKS TO A NEARBY ROOM WITH NO '?'s   ^^^^^
+
+
+
 res2 = bread(new_room)
+res3 = bread(res2)
+
+
+
+
+
+
 
 
 
