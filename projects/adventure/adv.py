@@ -29,300 +29,115 @@ player = Player(world.starting_room)
 
 # Fill this out with directions to walk
 
-
 traversal_path = []
 
+def traverse():
+    
+    visited = {
+      0: {'w': '?', 's': '?', 'n': '?', 'e': '?' }
+    }
 
-# THIS PART, AT LEAST, WORKS     
-#  VVVVVVVVVVVVVVVVVVVVVVVV
+    stax = Stack()
 
-graphq = Queue()
-graphq.enqueue([world.starting_room])
-traversal_graph = {}
+    prev_room = 0
 
-while graphq.size() > 0:
-    v = graphq.dequeue()
-    curr_room = v[-1]
+    direction_traveled = ''
+    
+    stax.push(0)
 
-    # fill out traversal graph with '?'s
-    if curr_room.id not in traversal_graph.keys():
-        traversal_graph[curr_room.id] = {}
-        path = []
+    while stax.size() > 0:
+        curr_room = stax.pop()
+        mark_visiting(player.current_room.id, prev_room, visited, direction_traveled)
         
-        if 'n' in curr_room.get_exits():
-            traversal_graph[curr_room.id]['n']= '?'
-            graphq.enqueue(path + [curr_room.n_to])
+        if '?' in visited[curr_room].values():
         
-        if 's' in curr_room.get_exits():
-            traversal_graph[curr_room.id]['s']= '?'
-            graphq.enqueue(path + [curr_room.s_to])
-
-        if 'w' in curr_room.get_exits():
-            traversal_graph[curr_room.id]['w']= '?'
-            graphq.enqueue(path + [curr_room.w_to])
-            
-        if 'e' in curr_room.get_exits():
-            traversal_graph[curr_room.id]['e']= '?'
-            graphq.enqueue(path + [curr_room.e_to])
-
-#  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# THIS PART UP HERE WORKS AS INTENDED
-
-
-
-
-# INITIAL TRAVERSAL, WORKS
-#  VVVVVVVVVVVVVVVVVVVVVV
-
-def initial(start):
-    queue = Queue()
-    queue.enqueue([start])
-    visited = set()
-
-    while queue.size() > 0:
-        v = queue.dequeue()
-        roomba = v[-1]
-        if roomba not in visited:
-            visited.add(roomba)
-            path = []
-            for item in v:
-                path.append(item)
-            for i in roomba.get_exits():
-                if i is 'n':
-                    queue.enqueue(path + [roomba.n_to])
-                if i is 's':
-                    queue.enqueue(path + [roomba.s_to])
-                if i is 'w':
-                    queue.enqueue(path + [roomba.w_to])
-                if i is 'e':
-                    queue.enqueue(path + [roomba.e_to])
+            for key, value in visited[curr_room].items():
+                if value == '?':
+                    player.travel(key)
+                    stax.push(player.current_room.id)
+                    direction_traveled = key
+                    traversal_path.append(direction_traveled)
+                    prev_room = curr_room
+                    break
         else:
-            final = []
-            roomz = []
-            room_idz = []
-            for i in path:
-                room_idz.append(i.id)
-                roomz.append(i)
-            for i in range(0, len(path)):
-                j = i - 1
-                if path[j].n_to == path[i]:
-                    final.append('n')
-                    traversal_graph[path[j].id]['n'] = path[i].id
-                    traversal_graph[path[i].id]['s'] = path[j].id
-                elif path[j].s_to == path[i]:
-                    final.append('s')
-                    traversal_graph[path[j].id]['s'] = path[i].id
-                    traversal_graph[path[i].id]['n'] = path[j].id
-                elif path[j].w_to == path[i]:
-                    final.append('w')
-                    traversal_graph[path[j].id]['w'] = path[i].id
-                    traversal_graph[path[i].id]['e'] = path[j].id
-                elif path[j].e_to == path[i]:
-                    final.append('e')
-                    traversal_graph[path[j].id]['e'] = path[i].id
-                    traversal_graph[path[i].id]['w'] = path[j].id
-    return [final, roomz[-1]]
-
-result = initial(world.starting_room)
-traversal_path = traversal_path + result[0]
-
-new_room = result[1]
-
-#  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# THIS BIT HERE WORKS (25 rooms down)
+            if bfs(curr_room, visited) is None:
+                break
+            
+            path = bfs(curr_room, visited)
+            new_traverse = []
+            
+            for index, room in enumerate(path):
+                if index < len(path) - 1 and path[index + 1] in visited[room].values():
+                    for key, value in visited[room].items():
+                        if value == path[index + 1]:
+                            new_traverse.append(key)
+            
+            for move in new_traverse:
+                prev_room = player.current_room.id
+                player.travel(move)
+                direction_traveled = move
+                traversal_path.append(move)
+            if '?' in visited[player.current_room.id].values():
+                stax.push(player.current_room.id)
 
 
 
+def mark_visiting(current_room, prev_room, visited, direction_traveled):
+    
+    if current_room not in visited:
+        
+        exits_array = player.current_room.get_exits()
+        exits = {}
 
-# V   REVERSAL WORKS   V
+        for direction in exits_array:
+            exits[direction] = '?'
+        if direction_traveled == 's':
+            exits['n'] = prev_room
+        elif direction_traveled == 'n':
+            exits['s'] = prev_room
+        elif direction_traveled == 'e':
+            exits['w'] = prev_room
+        elif direction_traveled == 'w':
+            exits['e'] = prev_room
+        
+        visited[current_room] = exits
+        visited[prev_room][direction_traveled] = current_room
+        
 
-def reverse(dir):
-    if dir == 'n':
-        return 's'
-    elif dir == 's':
-        return 'n'
-    elif dir == 'w':
-        return 'e'
-    elif dir == 'e':
-        return 'w'
     else:
-        return
+        if direction_traveled == 's':
+            visited[current_room]['n'] = prev_room
+        elif direction_traveled == 'n':
+            visited[current_room]['s'] = prev_room
+        elif direction_traveled == 'e':
+            visited[current_room]['w'] = prev_room
+        elif direction_traveled == 'w':
+            visited[current_room]['e'] = prev_room
 
-# ^   REVERSAL WORKS  ^
-
-
-
-
-# print(traversal_path)
-# print(reversal_path)
-
-
-def bread(room):
+def bfs(starting_vertex, visited):
+    
     queue = Queue()
-    queue.enqueue([room])
-    visited = set()
-    reversal_path = []
-    for i in reversed(traversal_path):
-        reversal_path.append(reverse(i))
-
+    queue.enqueue([starting_vertex])
+    
+    visited_rooms = set()
+    
     while queue.size() > 0:
-        v = queue.dequeue()
-        thisroom = v[-1]
-        final = []
-        if thisroom is not None and thisroom not in visited:
-            visited.add(thisroom)
-            path = []
-            for item in v:
-                path.append(item)
         
-                if '?' not in traversal_graph[thisroom.id].values():
-                    if reversal_path[0] == 'n':
-                        queue.enqueue(path + [thisroom.n_to])
-                        reversal_path.pop(0)
-                        traversal_path.append('n')
-
-                    elif reversal_path[0] == 's':
-                        queue.enqueue(path + [thisroom.s_to])
-                        reversal_path.pop(0)
-                        traversal_path.append('s')
-
-                    elif reversal_path[0] == 'w':
-                        queue.enqueue(path + [thisroom.w_to])
-                        reversal_path.pop(0)
-                        traversal_path.append('w')
-
-                    elif reversal_path[0] == 'e':
-                        queue.enqueue(path + [thisroom.e_to])
-                        reversal_path.pop(0)
-                        traversal_path.append('e')
-
-                if thisroom is not None and '?' in traversal_graph[thisroom.id].values():
-                    for i in thisroom.get_exits():
-                        if i is 'n' and traversal_graph[thisroom.id]['n'] is '?':
-                            queue.enqueue(path + [thisroom.n_to])
-                        if i is 's' and traversal_graph[thisroom.id]['s'] is '?':
-                            queue.enqueue(path + [thisroom.s_to])
-                        if i is 'w' and traversal_graph[thisroom.id]['w'] is '?':
-                            queue.enqueue(path + [thisroom.w_to])
-                        if i is 'e' and traversal_graph[thisroom.id]['e'] is '?':
-                            queue.enqueue(path + [thisroom.e_to])
-        else:
+        path = queue.dequeue()
+        
+        v = path[-1]
+        if v not in visited_rooms:
+            if '?' in visited[v].values():
+                return path
+            visited_rooms.add(v)
             
-            for i in range(0, len(v)-1):
-                j = i - 1
-                if path[j].n_to == path[i]:
-                    traversal_path.append('n')
-                    traversal_graph[path[j].id]['n'] = path[i].id
-                    traversal_graph[path[i].id]['s'] = path[j].id
-                elif path[j].s_to == path[i]:
-                    traversal_path.append('s')
-                    traversal_graph[path[j].id]['s'] = path[i].id
-                    traversal_graph[path[i].id]['n'] = path[j].id
-                elif path[j].w_to == path[i]:
-                    traversal_path.append('w')
-                    traversal_graph[path[j].id]['w'] = path[i].id
-                    traversal_graph[path[i].id]['e'] = path[j].id
-                elif path[j].e_to == path[i]:
-                    traversal_path.append('e')
-                    traversal_graph[path[j].id]['e'] = path[i].id
-                    traversal_graph[path[i].id]['w'] = path[j].id
-            idid = []
-            for i in v:
-                if i is not None:
-                    idid.append(i.id)
-    print(idid)
-    return path[-1]
+            for key, value in visited[v].items():
+                path_copy = path.copy()
+                path_copy.append(value)
+                queue.enqueue(path_copy)
 
-# ^^^^^  THIS WORKS, BACKTRACKS TO A NEARBY ROOM WITH NO '?'s   ^^^^^
+traverse()
 
-
-
-res2 = bread(new_room)
-res3 = bread(res2)
-res4 = bread(res3)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def initial(start):
-#     stack = Stack()
-#     stack.push([start])
-#     visited = set()
-
-#     last_direction = 'x'
-
-#     while stack.size() > 0:
-#             v = stack.pop()
-#             room = v[-1]
-            
-#             if room not in visited:
-#                 visited.add(room)
-#                 path = []
-#                 if last_direction is 'n':
-#                     if room.n_to is None and room.e_to is None and room.w_to is None: 
-#                         return v
-#                 if last_direction is 's':
-#                     if room.s_to is None and room.e_to is None and room.w_to is None: 
-#                         return v
-#                 if last_direction is 'w':
-#                     if room.n_to is None and room.e_to is None and room.s_to is None: 
-#                         return v
-#                 if last_direction is 'e':
-#                     if room.n_to is None and room.e_to is None and room.s_to is None: 
-#                         return v
-
-#                 for item in v:
-#                     path.append(item)
-#                 if 'n' in room.get_exits():
-#                     stack.push(path + [room.n_to])
-#                     last_direction = 'n'
-#                 elif 's' in room.get_exits():
-#                     stack.push(path + [room.s_to])
-#                     last_direction = 's'
-#                 elif 'w' in room.get_exits():
-#                     stack.push(path + [room.w_to])
-#                     last_direction = 'w'
-#                 elif 'e' in room.get_exits():
-#                     stack.push(path + [room.e_to])
-#                     last_direction = 'e'
-
-# list1 = initial(world.starting_room)
-# list2 = []
-
-# for i in list1:
-#     list2.append(i.id)
-
-# print("LIST2",list2)
-
-
-
-
-
-
-
-# print("GRAPH", traversal_graph)
-# print("PATH", traversal_path)
 
 
 # TRAVERSAL TEST
@@ -345,12 +160,12 @@ else:
 #######
 # UNCOMMENT TO WALK AROUND
 #######
-player.current_room.print_room_description(player)
-while True:
-    cmds = input("-> ").lower().split(" ")
-    if cmds[0] in ["n", "s", "e", "w"]:
-        player.travel(cmds[0], True)
-    elif cmds[0] == "q":
-        break
-    else:
-        print("I did not understand that command.")
+# player.current_room.print_room_description(player)
+# while True:
+#     cmds = input("-> ").lower().split(" ")
+#     if cmds[0] in ["n", "s", "e", "w"]:
+#         player.travel(cmds[0], True)
+#     elif cmds[0] == "q":
+#         break
+#     else:
+#         print("I did not understand that command.")
