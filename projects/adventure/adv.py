@@ -38,11 +38,8 @@ def traverse():
     }
 
     stax = Stack()
-
     prev_room = 0
-
     direction_traveled = ''
-    
     stax.push(0)
 
     while stax.size() > 0:
@@ -50,7 +47,6 @@ def traverse():
         mark_visiting(player.current_room.id, prev_room, visited, direction_traveled)
         
         if '?' in visited[curr_room].values():
-        
             for key, value in visited[curr_room].items():
                 if value == '?':
                     player.travel(key)
@@ -62,7 +58,7 @@ def traverse():
         else:
             if bfs(curr_room, visited) is None:
                 break
-            
+        
             path = bfs(curr_room, visited)
             new_traverse = []
             
@@ -77,6 +73,7 @@ def traverse():
                 player.travel(move)
                 direction_traveled = move
                 traversal_path.append(move)
+
             if '?' in visited[player.current_room.id].values():
                 stax.push(player.current_room.id)
 
@@ -85,12 +82,12 @@ def traverse():
 def mark_visiting(current_room, prev_room, visited, direction_traveled):
     
     if current_room not in visited:
-        
         exits_array = player.current_room.get_exits()
         exits = {}
 
         for direction in exits_array:
             exits[direction] = '?'
+
         if direction_traveled == 's':
             exits['n'] = prev_room
         elif direction_traveled == 'n':
@@ -103,7 +100,6 @@ def mark_visiting(current_room, prev_room, visited, direction_traveled):
         visited[current_room] = exits
         visited[prev_room][direction_traveled] = current_room
         
-
     else:
         if direction_traveled == 's':
             visited[current_room]['n'] = prev_room
@@ -124,11 +120,12 @@ def bfs(starting_vertex, visited):
     while queue.size() > 0:
         
         path = queue.dequeue()
-        
         v = path[-1]
+
         if v not in visited_rooms:
             if '?' in visited[v].values():
                 return path
+                
             visited_rooms.add(v)
             
             for key, value in visited[v].items():
