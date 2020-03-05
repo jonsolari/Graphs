@@ -1,3 +1,6 @@
+import random
+from util import Stack, Queue  
+
 class User:
     def __init__(self, name):
         self.name = name
@@ -29,36 +32,68 @@ class SocialGraph:
         self.friendships[self.last_id] = set()
 
     def populate_graph(self, num_users, avg_friendships):
-        """
-        Takes a number of users and an average number of friendships
-        as arguments
-
-        Creates that number of users and a randomly distributed friendships
-        between those users.
-
-        The number of users must be greater than the average number of friendships.
-        """
-        # Reset graph
+      
         self.last_id = 0
         self.users = {}
         self.friendships = {}
-        # !!!! IMPLEMENT ME
+      
+        for i in range(num_users):
+            self.add_user(f"User {i+1}")
 
-        # Add users
+        possible_friendships = []
+        for user_id in self.users:
+            for friend_id in range(user_id + 1, self.last_id+1):
+                possible_friendships.append((user_id, friend_id))
 
-        # Create friendships
+        
+
+        random.shuffle(possible_friendships)
+        
+
+        for i in range(num_users * avg_friendships // 2):
+            friendship = possible_friendships[i]
+            self.add_friendship(friendship[0], friendship[1])
+
+    def get_neighbors(self, vertex_id):    
+        return self.friendships[vertex_id]
+
+    def bfs(self, starting_vertex, destination_vertex):
+        
+        queue = Queue()
+        queue.enqueue([starting_vertex])
+        visited = set()
+    
+        while queue.size() > 0:
+            v = queue.dequeue()
+            if v[-1] == destination_vertex:
+                return v
+            if v[-1] not in visited:
+                visited.add(v[-1])
+                path = []
+                for item in v:
+                    path.append(item)
+                for neighbor in self.get_neighbors(v[-1]):
+                    queue.enqueue(path + [neighbor])
+
 
     def get_all_social_paths(self, user_id):
-        """
-        Takes a user's user_id as an argument
+   
+        visited = {} 
+    
+        queue = Queue()
+        queue.enqueue([user_id])
 
-        Returns a dictionary containing every user in that user's
-        extended network with the shortest friendship path between them.
+        while queue.size() > 0:
+            pathway = queue.dequeue()
+            vertex = pathway[-1]
+            if vertex not in visited:
+                visited[vertex] = pathway
 
-        The key is the friend's ID and the value is the path.
-        """
-        visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
+                for i in self.friendships[vertex]:
+                    copied = pathway.copy()
+                    copied.append(i)
+                    queue.enqueue(copied)
+            
         return visited
 
 
